@@ -72,7 +72,7 @@ class MainWindow(QMainWindow) :
         gapContainer = QVBoxLayout()
 
         tableGapContainer = QHBoxLayout()
-        tableGapLabel = QLabel("테이블 간 좌우 간격 : ")
+        tableGapLabel = QLabel("테이블 간 상하 간격 : ")
         tableGap = QLineEdit("2")
         tableGap.setObjectName("tableGap")
         tableGapContainer.addWidget(tableGapLabel)
@@ -84,9 +84,17 @@ class MainWindow(QMainWindow) :
         chartGap.setObjectName("chartGap")
         chartGapContainer.addWidget(chartGapLabel)
         chartGapContainer.addWidget(chartGap)
+        
+        table_chartGapContainer = QHBoxLayout()
+        table_chartGapLabel = QLabel("테이블-차트 간 간격 : ")
+        table_chartGap = QLineEdit("3")
+        table_chartGap.setObjectName("table_chartGap")
+        table_chartGapContainer.addWidget(table_chartGapLabel)
+        table_chartGapContainer.addWidget(table_chartGap)
 
         gapContainer.addLayout(tableGapContainer)
         gapContainer.addLayout(chartGapContainer)
+        gapContainer.addLayout(table_chartGapContainer)
         gapGroup.setLayout(gapContainer)
 
         optionContainer.addWidget(gapGroup, 0, 0)
@@ -103,15 +111,6 @@ class MainWindow(QMainWindow) :
         catStartPointContainer.addWidget(catStartPointlb)
         catStartPointContainer.addWidget(catStartPointEdtText)
         startPointContainer.addLayout(catStartPointContainer)
-
-        ## 데이터 시작 위치 설정
-        dataStartPointContainer = QHBoxLayout()
-        dataStartPointlb = QLabel("데이터 셀 검토 시작 좌표 : ")
-        dataStartPointEdtText = QLineEdit("B4")
-        dataStartPointEdtText.setObjectName("dataStartPointEdtText")
-        dataStartPointContainer.addWidget(dataStartPointlb)
-        dataStartPointContainer.addWidget(dataStartPointEdtText)
-        startPointContainer.addLayout(dataStartPointContainer)
 
         startPointGroup.setLayout(startPointContainer)
         optionContainer.addWidget(startPointGroup, 0, 1)
@@ -182,7 +181,7 @@ class MainWindow(QMainWindow) :
         self.setCentralWidget(widget)
 
         # 타이틀바 설정
-        self.setWindowTitle("통계 산출 프로그램 v1.0.0")
+        self.setWindowTitle("통계 산출 프로그램 v2.0.0")
         # 아이콘 설정
         self.setWindowIcon(QIcon(resource_path('./statistic.ico')))
         # 초기 위치 설정

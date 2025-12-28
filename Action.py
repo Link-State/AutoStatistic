@@ -4,6 +4,7 @@ import traceback
 from Exception import StatisticException
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
+from Util import *
 
 
 # 엑셀파일 찾으려고 할 때
@@ -27,28 +28,27 @@ def findExcelFile(kwargs) :
 
         # 검토 좌표 설정 불러오기
         catStartPointEdtText: QLineEdit = self_.findChild(QLineEdit, name="catStartPointEdtText")
-        dataStartPointEdtText: QLineEdit = self_.findChild(QLineEdit, name="dataStartPointEdtText")
         catStartPoint = catStartPointEdtText.text().strip()
-        dataStartPoint = dataStartPointEdtText.text().strip()
 
         # 항목 객체 불러오기
         refName = os.path.basename(refDir).strip()
         refName = os.path.splitext(refName)
-        statistic: Stat = Stat(refer=refDir, name=refName[0]+"_결과", catStartPoint=catStartPoint, dataStartPoint=dataStartPoint)
-        if len(statistic.categories) <= 0 :
+        statistic: Stat = Stat(refer=refDir, name=refName[0]+"_결과", catStartPoint=catStartPoint)
+
+        if len(statistic.dataframe.keys()) <= 0 :
             QMessageBox.critical(self_, '통계 산출 프로그램 알림', f'설문지에서 항목을 찾을 수 없습니다.')
             return
         
-        # 항목 객체로 체크박스 만들기
+        # 기존 항목 제거
         categoryItem: QGridLayout = self_.findChild(QGridLayout, name="categoryCheckboxLayout").layout()
-        for i in reversed(range(categoryItem.count())) :
-            categoryItem.itemAt(i).widget().deleteLater()
+        clearLayout(categoryItem)
         
-        for i, key in enumerate(statistic.categories.keys()) :
+        # 항목 객체로 체크박스 만들기
+        for i, key in enumerate(statistic.dataframe.keys()) :
             
             categoryBox = QHBoxLayout()
 
-            checkBox = QCheckBox(key)
+            checkBox = QCheckBox(str(key))
 
             unitEdtText = QLineEdit()
             unitEdtText.setFixedWidth(100)
@@ -121,11 +121,12 @@ def generateStatistic(kwargs) :
     from Window import MainWindow
     from MouseEvent import ClickEditText
     from Stat import Stat
-    from Category import Category
 
     self_: MainWindow = kwargs["self_"]
     this: ClickEditText = kwargs["this"]
     statistic: Stat = self_.statistic
+
+    statistic.clear()
 
     try :
         # 통계 객체 생성 체크
@@ -164,37 +165,36 @@ def generateStatistic(kwargs) :
             item:QCheckBox = boxContainer.itemAt(0).widget()
             unit:QLineEdit = boxContainer.itemAt(1).widget()
 
-            if item.text() in statistic.categories :
-                cat: Category = statistic.categories[item.text()]
-                cat.unit = unit.text()
+            if item.text() in statistic.dataframe.keys() :
+                statistic.unit[item.text()] = unit.text()
                 if item.isChecked() :
-                    cat.isComparison = True
+                    statistic.fundamental_category.append(item.text())
                 else :
-                    cat.isComparison = False
-        statistic.divideCategory()
+                    statistic.correlation_category.append(item.text())
         
         # 고급 옵션 불러와서 적용하기
         tableGapEdtText: QLineEdit = self_.findChild(QLineEdit, name="tableGap")
         chartGapEdtText: QLineEdit = self_.findChild(QLineEdit, name="chartGap")
+        table_chartGapEdtText: QLineEdit = self_.findChild(QLineEdit, name="table_chartGap")
         nullSymbolEdtText: QLineEdit = self_.findChild(QLineEdit, name="nullSymbol")
         catStartPointEdtText: QLineEdit = self_.findChild(QLineEdit, name="catStartPointEdtText")
-        dataStartPointEdtText: QLineEdit = self_.findChild(QLineEdit, name="dataStartPointEdtText")
         multiSelectedSplitSymbolEdtText: QLineEdit = self_.findChild(QLineEdit, name="multiSelectedSplitSymbolEdtText")
 
         tableGap = tableGapEdtText.text().strip()
         chartGap = chartGapEdtText.text().strip()
+        table_chartGap = table_chartGapEdtText.text().strip()
         nullSymbol = nullSymbolEdtText.text().strip()
         catStartPoint = catStartPointEdtText.text().strip()
-        dataStartPoint = dataStartPointEdtText.text().strip()
         multiSelectedSplitSymbol = multiSelectedSplitSymbolEdtText.text().strip()
 
         if tableGap.isdigit() :
             statistic.table_gap = int(tableGap)
         if chartGap.isdigit() :
             statistic.chart_gap = int(chartGap)
+        if table_chartGap.isdigit() :
+            statistic.table_chart_gap = int(table_chartGap)
         statistic.nullSymbol = nullSymbol
         statistic.catStartPoint = catStartPoint
-        statistic.dataStartPoint = dataStartPoint
         statistic.multiSelectSplitSymbol = multiSelectedSplitSymbol
         
         # 시트 생성

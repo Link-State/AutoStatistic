@@ -2,17 +2,17 @@ import sys
 import os
 import Window
 
-
 # ---- versions ----
 # Windows 11
 # Python 3.12.6
 # pip 24.2
 
 # PyQt5 5.15.11
-# PyQt5-Qt5 5.15.2
-# PyQt5_sip 12.15.0
+# └ PyQt5-Qt5 5.15.2
+# └ PyQt5_sip 12.15.0
 # openpyxl 3.1.5
 # Pyinstaller 6.11.1
+# pandas 2.3.3
 
 
 # ---- build command ----
